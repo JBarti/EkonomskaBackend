@@ -23,7 +23,6 @@ createAuthPoint = (userType, UserController) => {
           logger.logError(error);
         }
         if (user) {
-          user = user.get({ plain: true });
           user.type = userType;
           return done(null, user);
         } else {

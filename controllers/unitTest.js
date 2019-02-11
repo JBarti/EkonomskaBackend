@@ -19,11 +19,7 @@ module.exports = async () => {
 
   logger.logTest("Test create student");
   let student = await studentController.create(testUser);
-  logger.logData(
-    student.get({
-      plain: true
-    })
-  );
+  logger.logData(student);
 
   logger.logTest("Test addNotification");
   let status = await studentController.addNotification(1, {
@@ -72,11 +68,10 @@ module.exports = async () => {
   } catch (error) {
     logger.logError(error);
   }
-  logger.logData(
-    student.get({
-      plain: true
-    })
-  );
+  console.log("\n\n\n");
+
+  console.log(student);
+  logger.logData(student);
 
   logger.logTest("Test check user existence");
   status = await studentController.checkExistance("testtest@gmail.com");

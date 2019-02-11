@@ -1,14 +1,22 @@
 const Sequelize = require("sequelize");
 
-console.log(process.env.DATABASE_URL);
+let sequelize;
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  protocol: "postgres",
-  dialectOptions: {
-    ssl: true
-  }
-});
+try {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: "postgres",
+    protocol: "postgres",
+    dialectOptions: {
+      ssl: true
+    }
+  });
+} catch (error) {
+  sequelize = new Sequelize("ekonomska", "postgres", "admin", {
+    dialect: "postgres",
+    host: "localhost",
+    port: 5432
+  });
+}
 const Student = require("../data/models/student")(sequelize, Sequelize);
 const Grade = require("../data/models/grade")(sequelize, Sequelize);
 const Finance = require("../data/models/finance")(sequelize, Sequelize);
@@ -45,14 +53,14 @@ setup = () => {
     through: "TestQuestion"
   });
 
+  Student.hasMany(Solution);
+
   Proffesor.hasMany(Grade);
 
   return sequelize.sync({
     force: true
   });
 };
-
-Sequelize.ARRAY();
 
 module.exports = {
   Student,

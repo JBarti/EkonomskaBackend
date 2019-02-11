@@ -10,6 +10,7 @@ const {
 } = require("./config");
 const logger = require("../logger");
 const { sequelize } = require("./config");
+const Op = sequelize.Op;
 
 const Controller = {
   create: ({ firstName, lastName, email, password }) => {
@@ -22,34 +23,42 @@ const Controller = {
   },
 
   get: (email, password, logingIn = true) => {
-    console.log(
-      `Test get: \nentered email: ${email} \nentered password: ${password}`
-    );
-    return Student.find({
-      attributes: [
-        "id",
-        "firstName",
-        "lastName",
-        "email",
-        "notifications",
-        "active",
-        "gradeId"
-      ],
-      include: [
-        {
-          model: Grade,
-          include: [
-            {
-              model: Folder,
-              include: [{ model: Test, include: [Question] }, { model: File }]
-            }
-          ]
+    return new Promise((resolve, reject) => {
+      Student.find({
+        attributes: [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "notifications",
+          "active",
+          "gradeId"
+        ],
+        include: [
+          {
+            model: Grade,
+            include: [
+              {
+                model: Folder,
+                include: [{ model: Test, include: [Question] }, { model: File }]
+              }
+            ]
+          }
+        ],
+        where: {
+          email: email,
+          password: password
         }
-      ],
-      where: {
-        email: email,
-        password: password
-      }
+      }).then(student => {
+        Controller.getSolutions(student.id).then(solutions => {
+          student = student.get({ plain: true });
+          console.log("\n\n");
+          console.log(solutions);
+          console.log("\n\n");
+          student.solutions = solutions;
+          resolve(student);
+        });
+      });
     });
   },
   getById: id => {
@@ -65,6 +74,9 @@ const Controller = {
       ],
       where: { id: id }
     });
+  },
+  getSolutions: studentId => {
+    return Solution.findAll({ where: { studentId } });
   },
   checkExistance: email => {
     return Student.count({

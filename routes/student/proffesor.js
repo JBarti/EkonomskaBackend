@@ -1,24 +1,28 @@
-var express = require("express");
-var logger = require("../../logger");
-var ProffesorController = require("../../controllers/proffesor");
-var FileController = require("../../controllers/file");
-var GradeController = require("../../controllers/grade");
-var StudentController = require("../../controllers/student");
-var TestController = require("../../controllers/test");
-var QuestionController = require("../../controllers/question");
-var router = express.Router();
+const express = require("express");
+const logger = require("../../logger");
+const ProffesorController = require("../../controllers/proffesor");
+const FileController = require("../../controllers/file");
+const GradeController = require("../../controllers/grade");
+const StudentController = require("../../controllers/student");
+const TestController = require("../../controllers/test");
+const QuestionController = require("../../controllers/question");
+const FolderController = require("../../controllers/folder");
+const router = express.Router();
 
 router.get("/test", (req, res, next) => {
   return res.send("test");
 });
 
 router.get("/", (req, res, next) => {
+  console.log("GETN");
   let user = JSON.parse(req.user);
-  if (!user.type === "proffesor") {
+  console.log(user);
+  if (!user.type === "student") {
     return res.status(401).send("User not logged in");
   }
   logger.logData(user);
   if (user) {
+    logger.logMessage("Retrieved user data");
     return res.send(user);
   }
   return res.status(401).send("User not logged in");
@@ -42,7 +46,10 @@ router.get("/get", (req, res, next) => {
 });
 
 router.use(async (req, res, next) => {
-  return res.send(JSON.parse(req.user));
+  user = JSON.parse(req.user);
+  return user.type !== "student"
+    ? next()
+    : res.status(401).send("Unauthorized access");
 });
 
 router.post("/file", async (req, res, next) => {
@@ -143,12 +150,22 @@ router.post("/student", async (req, res, next) => {
     email,
     password
   });
-  student = student.get({
-    plain: true
-  });
   let status = await GradeController.addStudent(student.id, req.body.gradeId);
   logger.logMessage(status);
   return res.send(student);
+});
+
+router.post("/folder", async (req, res, next) => {
+  let { name, description, gradeId } = req.body;
+  let folder = await FolderController.create({
+    name,
+    description,
+    type: "undefined"
+  });
+  folder = folder.get({ plain: true });
+  logger.logData(folder);
+  GradeController.addFolder(folder.id, gradeId);
+  return res.send(folder);
 });
 
 module.exports = router;

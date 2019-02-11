@@ -1,16 +1,18 @@
-var express = require("express");
-var logger = require("../../logger");
-var StudentController = require("../../controllers/student");
-var router = express.Router();
-var { passport, session } = require("../../auth");
+const express = require("express");
+const logger = require("../../logger");
+const StudentController = require("../../controllers/student");
+const TestController = require("../../controllers/test");
+const { passport, session } = require("../../auth");
+
+const router = express.Router();
 
 router.get("/test", function(req, res, next) {
   return res.send("api working");
 });
 
 router.get("/", (req, res, next) => {
-  let user = JSON.parse(req.user);
-  if (!user.type === "student") {
+  const user = JSON.parse(req.user);
+  if (user.type !== "student") {
     return res.status(401).send("User not logged in");
   }
   logger.logMessage("Retrieved user data");
@@ -35,13 +37,16 @@ router.post("/register", async (req, res, next) => {
   logger.logMessage("Trying to register new user: ");
   logger.logData(req.body);
 
-  let props = ["email", "firstName"];
+  const props = ["email", "firstName", "lastName", "password"];
+
+  console.log(req.body);
+  console.log(req.body.email);
 
   if (props.every(val => val in req.body)) {
     logger.logMessage("Request has all neded properties");
-    if (!(await StudentController.user.checkExistance(req.body.email))) {
+    if (!(await StudentController.checkExistance(req.body.email))) {
       logger.logMessage("User doesnt exist");
-      let user = await StudentController.user.create(req.body);
+      const user = await StudentController.create(req.body);
       logger.logMessage("Created user");
       logger.logData(
         user.get({
@@ -74,7 +79,7 @@ router.get("/get", (req, res, next) => {
 
 router.post("/test/solve", async (req, res, next) => {
   logger.logMessage("Passing test solution");
-  let status = await StudentController.solveTest(req.body);
+  const status = await TestController.solveTest(req.body);
   return res.send(status);
 });
 
