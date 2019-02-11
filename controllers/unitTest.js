@@ -251,3 +251,9 @@ module.exports = async () => {
   status = await proffesorController.addGrade(1, 1);
   logger.logData(status);
 };
+
+testController.createSolution(1, ["11", "22"], 5, 1);
+
+testController.createSolution(1, ["11", "20"], 20, 1);
+
+testController.createSolution(1, ["10", "20"], 25, 1);
