@@ -41,7 +41,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 let corsOptions = {
-  origin: "https://f-pismenost-webpage.herokuapp.com/",
+  origin: "https://f-pismenost-webpage.herokuapp.com",
   credentials: true
 };
 
