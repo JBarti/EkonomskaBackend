@@ -45,7 +45,7 @@ let corsOptions = {
   credentials: true
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 logger.logImportant(
   "###################\n####APP STARTED####\n###################"
