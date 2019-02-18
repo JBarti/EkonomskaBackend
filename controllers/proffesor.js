@@ -50,6 +50,20 @@ const Controller = {
   getById: proffesorId => {
     return Proffesor.find({
       attributes: ["id", "firstName", "lastName", "email", "notifications"],
+      include: [
+        {
+          model: Grade,
+          include: [
+            {
+              model: Student
+            },
+            {
+              model: Folder,
+              include: [File, { model: Test, include: [Question] }]
+            }
+          ]
+        }
+      ],
       where: {
         id: proffesorId
       }

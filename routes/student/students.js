@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("../../logger");
 const StudentController = require("../../controllers/student");
 const TestController = require("../../controllers/test");
+const GradeController = require("../../controllers/grade");
 const { passport, session } = require("../../auth");
 
 const router = express.Router();
@@ -34,7 +35,9 @@ router.get("/logout", (req, res, next) => {
 });
 
 router.post("/register", async (req, res, next) => {
+  let gradeId = req.body.gradeId;
   logger.logMessage("Trying to register new user: ");
+  req.body = req.body.student;
   logger.logData(req.body);
 
   const props = ["email", "firstName", "lastName", "password"];
@@ -53,11 +56,8 @@ router.post("/register", async (req, res, next) => {
           plain: true
         })
       );
-      return res.send(
-        user.get({
-          plain: true
-        })
-      );
+      GradeController.addStudent(user.get({ plain: true }).id, gradeId);
+      return res.send({ user: user.get({ plain: true }), gradeId });
     } else {
       return res.status(403).send("User already exists");
     }

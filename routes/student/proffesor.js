@@ -13,7 +13,7 @@ router.get("/test", (req, res, next) => {
   return res.send("test");
 });
 
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
   console.log("GETN");
   let user = JSON.parse(req.user);
   console.log(user);
@@ -23,7 +23,8 @@ router.get("/", (req, res, next) => {
   logger.logData(user);
   if (user) {
     logger.logMessage("Retrieved user data");
-    return res.send(user);
+    user = await ProffesorController.getById(user.id);
+    return res.send(user.get({ plain: true }));
   }
   return res.status(401).send("User not logged in");
 });
@@ -95,51 +96,53 @@ router.post("/file", async (req, res, next) => {
 });
 
 router.post("/test", async (req, res, next) => {
-  if (req.body.testId) await TestController.removeTest(req.body.testId);
-
-  let test = await TestController.create({
-    name: req.body.testName,
-    active: true,
-    lesson: req.body.lesson
-  });
-
-  let func = async () => {
-    return (data = req.body.questions.map(async question => {
-      let dt = await QuestionController.create({
-        text: question.text,
-        answers: question.answers || []
-      });
-      return dt.get({
-        plain: true
-      }).id;
-    }));
+  const { folderId, test } = req.body;
+  let isNew = true;
+  createQuestions = async test => {
+    let ids = [];
+    for (i = 0; i < test.questions.length; i++) {
+      console.log("PITANJE");
+      console.log(test.questions[i]);
+      question = test.questions[i];
+      if (question.id) {
+        let oldQ = { ...question };
+        QuestionController.delete(question.id);
+        let newQ = await QuestionController.create({
+          text: oldQ.text,
+          answers: oldQ.answers
+        });
+        ids.push(newQ.get({ plain: true }).id);
+      } else {
+        let newQ = await QuestionController.create({
+          text: question.text,
+          answers: question.answers
+        });
+        ids.push(newQ.get({ plain: true }).id);
+      }
+    }
+    return ids;
   };
-  let idk = await func();
-  logger.logText("DATA");
-  Promise.all(idk).then(ids => {
-    TestController.setQuestions(
-      ids,
-      test.get({
-        plain: true
-      }).id
-    ).then(data => {});
-    GradeController.addTest(
-      test.get({
-        plain: true
-      }).id,
-      req.body.gradeId
-    );
-    grade.students.map(student => {
-      StudentController.addNotification(student.id, {
-        from: "PROFESOR",
-        description: "added test",
-        text: `Proffesor has added ${req.body.testName} to 1. lesson`
-      }).then(data => {
-        logger.logData(data);
-      });
-    });
-    return res.send("DONE");
-  });
+
+  let ids = [];
+  if (test.id) {
+    TestController.removeTest(test.id);
+    ids = await createQuestions(test);
+    isNew = false;
+    console.log("NOVA PITANJAAA");
+    logger.logData(test.questions);
+    console.log("NOVA PITANJAAA");
+    logger.logData(ids);
+  }
+
+  console.log("PITANJAA");
+  console.log(test.questions);
+  newTest = await TestController.create({ name: test.name });
+  logger.logData(newTest.get({ plain: true }));
+  FolderController.addTest(newTest.get({ plain: true }).id, folderId);
+
+  TestController.setQuestions(ids, newTest.id);
+  newTest = await TestController.get(newTest.id);
+  return res.send({ folderId, test: newTest, isNew: isNew });
 });
 
 router.post("/student", async (req, res, next) => {
@@ -166,6 +169,25 @@ router.post("/folder", async (req, res, next) => {
   logger.logData(folder);
   GradeController.addFolder(folder.id, gradeId);
   return res.send(folder);
+});
+
+router.post("/grade", async (req, res, next) => {
+  let { name, proffesorId } = req.body;
+  let grade = await GradeController.create({ name });
+  console.log(grade);
+  let x = await ProffesorController.addGrade(proffesorId, grade.id);
+  return res.send({ grade: grade.get({ plain: true }) });
+});
+
+router.post("/solutions", async (req, res, next) => {
+  let { ids, gradeId } = req.body;
+  logger.logData(ids);
+  logger.logData(gradeId);
+  let solutions = await StudentController.getGradeSolutions(ids);
+  solutions = solutions.map(solution => {
+    return solution.dataValues;
+  });
+  return res.send({ solutions, gradeId });
 });
 
 module.exports = router;

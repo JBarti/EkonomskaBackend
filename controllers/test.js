@@ -2,11 +2,10 @@ const { Test, Question, Solution } = require("./config");
 const questionController = require("./question");
 
 const Controller = {
-  create: ({ name, testId, active = false }) => {
+  create: ({ name, active = false }) => {
     return Test.create({
       name,
-      active,
-      testId
+      active
     });
   },
 

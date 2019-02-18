@@ -141,8 +141,7 @@ module.exports = async () => {
   logger.logTest("Create test");
   let test = await testController.create({
     name: "testing test",
-    active: true,
-    folderId: 1
+    active: true
   });
   logger.logData(
     test.get({

@@ -85,6 +85,9 @@ const Controller = {
       }
     });
   },
+  getGradeSolutions: studentIds => {
+    return Solution.findAll({ where: { studentId: { [Op.in]: studentIds } } });
+  },
   addNotification: (id, { from, description, text, important }) => {
     return Student.update(
       {

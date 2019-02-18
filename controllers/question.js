@@ -14,6 +14,10 @@ const Controller = {
     });
   },
 
+  delete: questionId => {
+    return Question.destroy({ where: { id: questionId } });
+  },
+
   get: questionId => {
     return Question.find({ where: { id: id } });
   },
