@@ -37,6 +37,18 @@ const Controller = {
           reject(err);
         });
     });
+  },
+  addNotification: (notificationId, gradeId) => {
+    return new Promise((resolve, reject) => {
+      Controller.get(gradeId)
+        .then(razred => {
+          razred.addNotification(notificationId);
+          resolve("added notification to grade");
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 };
 

@@ -3,6 +3,7 @@ const logger = require("../../logger");
 const ProffesorController = require("../../controllers/proffesor");
 const FileController = require("../../controllers/file");
 const GradeController = require("../../controllers/grade");
+const NotificationController = require("../../controllers/notification");
 const StudentController = require("../../controllers/student");
 const TestController = require("../../controllers/test");
 const QuestionController = require("../../controllers/question");
@@ -188,6 +189,22 @@ router.post("/solutions", async (req, res, next) => {
     return solution.dataValues;
   });
   return res.send({ solutions, gradeId });
+});
+
+router.post("/notifications", async (req, res, next) => {
+  let { title, description, gradeId } = req.body;
+  let notification = await NotificationController.create({
+    title,
+    description
+  });
+  await GradeController.addNotification(notification.id, gradeId);
+  return res.send({ notification, gradeId });
+});
+
+router.delete("/notifications", async (req, res, next) => {
+  let { notificationId } = req.body;
+  let status = await NotificationController.removeNotification(notificationId);
+  return res.send({ notificationId });
 });
 
 module.exports = router;

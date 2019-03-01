@@ -26,6 +26,10 @@ const File = require("../data/models/file")(sequelize, Sequelize);
 const Solution = require("../data/models/solution")(sequelize, Sequelize);
 const Proffesor = require("../data/models/proffesor")(sequelize, Sequelize);
 const Folder = require("../data/models/folder")(sequelize, Sequelize);
+const Notification = require("../data/models/notification")(
+  sequelize,
+  Sequelize
+);
 
 setup = () => {
   Grade.hasMany(Student);
@@ -44,6 +48,7 @@ setup = () => {
   Folder.hasMany(Test);
 
   Grade.hasMany(Folder);
+  Grade.hasMany(Notification);
 
   Test.belongsToMany(Question, {
     through: "TestQuestion"
@@ -73,6 +78,7 @@ module.exports = {
   Solution,
   Proffesor,
   Folder,
+  Notification,
   setup: () => {
     return setup();
   }

@@ -7,7 +7,8 @@ const questionController = require("./question");
 const fileController = require("./file");
 const proffesorController = require("./proffesor");
 const folderController = require("./folder");
-const { Student, Folder } = require("./config");
+const notificationController = require("./notification");
+const { Student, Folder, Notification } = require("./config");
 
 module.exports = async () => {
   const testUser = {
@@ -255,4 +256,18 @@ module.exports = async () => {
   testController.createSolution(1, ["11", "20"], 20, 1);
 
   testController.createSolution(1, ["10", "20"], 25, 1);
+
+  status = await notificationController.create({
+    title: "Welcome",
+    description: "Pozdrav od kreatora aplikacije"
+  });
+  status = await gradeController.addNotification(1, 1);
+
+  logger.logTest("Get grade");
+  grade = await gradeController.get(1, [Student, Folder, Notification]);
+  logger.logData(
+    grade.get({
+      plain: true
+    })
+  );
 };

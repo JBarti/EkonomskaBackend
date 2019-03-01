@@ -5,7 +5,8 @@ const {
   File,
   Grade,
   Question,
-  Folder
+  Folder,
+  Notification
 } = require("./config");
 const logger = require("../logger");
 const { sequelize } = require("./config");
@@ -33,6 +34,7 @@ const Controller = {
             {
               model: Student
             },
+            { model: Notification },
             {
               model: Folder,
               include: [File, { model: Test, include: [Question] }]
@@ -57,6 +59,7 @@ const Controller = {
             {
               model: Student
             },
+            { model: Notification },
             {
               model: Folder,
               include: [File, { model: Test, include: [Question] }]
