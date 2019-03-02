@@ -222,9 +222,9 @@ module.exports = async () => {
 
   logger.logTest("Create Proffesor");
   let proffesor = await proffesorController.create({
-    firstName: "profesor",
-    lastName: "profesoric",
-    email: "profprofi@gmail.com",
+    firstName: "Ante",
+    lastName: "Bartulović",
+    email: "profBartulović",
     password: "prof"
   });
   logger.logData(

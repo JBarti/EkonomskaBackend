@@ -16,8 +16,14 @@ router.get("/test", (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   console.log("GETN");
-  let user = JSON.parse(req.user);
-  console.log(user);
+  let user = {};
+
+  try {
+    user = JSON.parse(req.user);
+  } catch (error) {
+    return res.status(403).send("0");
+  }
+  console.log(user.id);
   if (!user.type === "student") {
     return res.status(401).send("User not logged in");
   }
@@ -99,6 +105,7 @@ router.post("/file", async (req, res, next) => {
 router.post("/test", async (req, res, next) => {
   const { folderId, test } = req.body;
   let isNew = true;
+
   createQuestions = async test => {
     let ids = [];
     for (i = 0; i < test.questions.length; i++) {
@@ -125,7 +132,8 @@ router.post("/test", async (req, res, next) => {
   };
 
   let ids = [];
-  if (test.id) {
+  if (test.id >= 0) {
+    console.log("REMOVA SAN GA");
     TestController.removeTest(test.id);
     ids = await createQuestions(test);
     isNew = false;
@@ -143,7 +151,7 @@ router.post("/test", async (req, res, next) => {
 
   TestController.setQuestions(ids, newTest.id);
   newTest = await TestController.get(newTest.id);
-  return res.send({ folderId, test: newTest, isNew: isNew });
+  return res.send({ folderId, test: newTest, oldId: isNew ? -1 : test.id });
 });
 
 router.post("/student", async (req, res, next) => {
@@ -157,6 +165,26 @@ router.post("/student", async (req, res, next) => {
   let status = await GradeController.addStudent(student.id, req.body.gradeId);
   logger.logMessage(status);
   return res.send(student);
+});
+
+router.post("/student/update", async (req, res, next) => {
+  let { firstName, lastName, email, password, id } = req.body;
+  logger.logData(password);
+  let student = await StudentController.updateCredentials(
+    id,
+    firstName,
+    lastName,
+    email,
+    password
+  );
+  logger.logData(student);
+  return res.send({ firstName, lastName, email, password, id });
+});
+
+router.delete("/student", async (req, res, next) => {
+  let { studentId } = req.body;
+  let status = StudentController.remove(studentId);
+  return res.send({ studentId });
 });
 
 router.post("/folder", async (req, res, next) => {

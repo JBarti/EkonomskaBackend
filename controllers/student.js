@@ -63,7 +63,7 @@ const Controller = {
       });
     });
   },
-  getById: id => {
+  getByIdSecond: id => {
     return Student.find({
       attributes: [
         "id",
@@ -75,6 +75,46 @@ const Controller = {
         "gradeId"
       ],
       where: { id: id }
+    });
+  },
+  getById: id => {
+    return new Promise((resolve, reject) => {
+      Student.find({
+        attributes: [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "notifications",
+          "active",
+          "gradeId"
+        ],
+        include: [
+          {
+            model: Grade,
+            include: [
+              { model: Notification },
+              {
+                model: Folder,
+                include: [{ model: Test, include: [Question] }, { model: File }]
+              }
+            ]
+          }
+        ],
+        where: {
+          email: email,
+          password: password
+        }
+      }).then(student => {
+        Controller.getSolutions(student.id).then(solutions => {
+          student = student.get({ plain: true });
+          console.log("\n\n");
+          console.log(solutions);
+          console.log("\n\n");
+          student.solutions = solutions;
+          resolve(student);
+        });
+      });
     });
   },
   getSolutions: studentId => {
@@ -114,7 +154,7 @@ const Controller = {
   addFinance: (studentId, financeId) => {
     logger.logError(studentId);
     return new Promise((resolve, reject) => {
-      Controller.getById(studentId)
+      Controller.getByIdSecond(studentId)
         .then(student => {
           student.addFinance(financeId);
           resolve("added finance to student");
@@ -137,9 +177,25 @@ const Controller = {
       }
     );
   },
+  updateCredentials: (id, firstName, lastName, email, password) => {
+    return Student.update(
+      {
+        firstName,
+        lastName,
+        email,
+        password
+      },
+      { where: { id: id } }
+    );
+  },
+  remove: studentId => {
+    return Student.destroy({
+      where: { id: studentId }
+    });
+  },
   solveTest: ({ studentId, testId, solution, testPoints, studentsPoints }) => {
     return new Promise((resolve, reject) => {
-      Controller.getById(studentId)
+      Controller.getByIdSecond(studentId)
         .then(data => {
           Solution.create({
             solution,
