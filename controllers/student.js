@@ -85,9 +85,9 @@ const Controller = {
           "firstName",
           "lastName",
           "email",
-          "notifications",
           "active",
-          "gradeId"
+          "gradeId",
+          "notifications"
         ],
         include: [
           {
@@ -102,8 +102,7 @@ const Controller = {
           }
         ],
         where: {
-          email: email,
-          password: password
+          id: id
         }
       }).then(student => {
         Controller.getSolutions(student.id).then(solutions => {

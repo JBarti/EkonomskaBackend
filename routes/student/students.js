@@ -11,7 +11,7 @@ router.get("/test", function(req, res, next) {
   return res.send("api working");
 });
 
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
   const user = JSON.parse(req.user);
   if (user.type !== "student") {
     return res.status(403).send("User not logged in");
@@ -19,7 +19,8 @@ router.get("/", (req, res, next) => {
   logger.logMessage("Retrieved user data");
   logger.logData(user);
   if (user) {
-    return res.send(user);
+    let newUser = await StudentController.getById(user.id);
+    return res.send(newUser);
   }
   return res.status(403).send("User not logged in");
 });

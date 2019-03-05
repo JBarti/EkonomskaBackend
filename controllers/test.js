@@ -14,14 +14,14 @@ const Controller = {
       where: {
         id: testId
       },
-      include: [Question]
+      include: [{ model: Question }]
     });
   },
   setQuestions: (questionIds, testId) => {
     return new Promise((resolve, reject) => {
       Controller.get(testId)
-        .then(test => {
-          test.setQuestions(questionIds);
+        .then(async test => {
+          await test.setQuestions(questionIds);
           resolve("Set tests questions");
         })
         .catch(err => {

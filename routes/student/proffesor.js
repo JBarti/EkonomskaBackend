@@ -62,50 +62,19 @@ router.use(async (req, res, next) => {
 
 router.post("/file", async (req, res, next) => {
   logger.logMessage("TRYING TO ADD FILE");
-  let data = await FileController.create({
-    name: req.body.name,
-    url: req.body.url,
-    lesson: req.body.lesson,
-    active: true
-  });
-
-  let status = await GradeController.addFile(
-    data.get({
-      plain: true
-    }).id,
-    req.body.gradeId
-  );
-
-  logger.logMessage(status);
-
-  let grade = await GradeController.get(req.body.gradeId);
-  logger.logData(
-    grade.get({
-      plain: true
-    })
-  );
-
-  grade.students.map(student => {
-    StudentController.addNotification(student.id, {
-      from: "PROFESOR",
-      description: "added text",
-      text: `Proffesor has added ${req.body.name} to ${req.body.lesson}. lesson`
-    }).then(data => {
-      logger.logData(data);
-    });
-  });
-
-  return res.send(
-    data.get({
-      plain: true
-    })
-  );
+  let { pdf, folderId } = req.body;
+  let { name, url } = pdf;
+  link = url;
+  let file = await FileController.create({ name, url: link });
+  file = file.get({ plain: true });
+  await FolderController.addFile(file.id, folderId);
+  return res.send({ folderId, file });
 });
 
 router.post("/test", async (req, res, next) => {
   const { folderId, test } = req.body;
   let isNew = true;
-
+  let newIds = [];
   createQuestions = async test => {
     let ids = [];
     for (i = 0; i < test.questions.length; i++) {
@@ -131,26 +100,25 @@ router.post("/test", async (req, res, next) => {
     return ids;
   };
 
-  let ids = [];
-  if (test.id >= 0) {
-    console.log("REMOVA SAN GA");
-    TestController.removeTest(test.id);
-    ids = await createQuestions(test);
-    isNew = false;
-    console.log("NOVA PITANJAAA");
-    logger.logData(test.questions);
-    console.log("NOVA PITANJAAA");
-    logger.logData(ids);
-  }
-
-  console.log("PITANJAA");
   console.log(test.questions);
   newTest = await TestController.create({ name: test.name });
   logger.logData(newTest.get({ plain: true }));
   FolderController.addTest(newTest.get({ plain: true }).id, folderId);
 
-  TestController.setQuestions(ids, newTest.id);
+  if (test.id >= 0) {
+    console.log("REMOVA SAN GA");
+    TestController.removeTest(test.id);
+    newIds = await createQuestions(test);
+    isNew = false;
+  }
+
+  console.log("AJDIEVI", newIds);
+
+  let status = await TestController.setQuestions(newIds, newTest.id);
   newTest = await TestController.get(newTest.id);
+  console.log("\n\n\n");
+  console.log(status);
+  console.log(newTest);
   return res.send({ folderId, test: newTest, oldId: isNew ? -1 : test.id });
 });
 
