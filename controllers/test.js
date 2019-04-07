@@ -2,10 +2,11 @@ const { Test, Question, Solution } = require("./config");
 const questionController = require("./question");
 
 const Controller = {
-  create: ({ name, active = false }) => {
+  create: ({ name, isQuiz = false, active = false }) => {
     return Test.create({
       name,
-      active
+      active,
+      isQuiz
     });
   },
 
@@ -67,6 +68,9 @@ const Controller = {
           });
       });
     });
+  },
+  lock: testId => {
+    return Test.update({ locked: true }, { where: { id: testId } });
   }
 };
 

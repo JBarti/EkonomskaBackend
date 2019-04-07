@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 var logger = require("../../logger");
 var { passport, session } = require("../../auth");
+var gradeController = require("../../controllers/grade");
 
 /* GET home page. */
 router.get("/test", (req, res, next) => {
@@ -52,5 +53,10 @@ router.post("/login", [
     })(req, res, next);
   }
 ]);
+
+router.get("/grades", async (req, res, next) => {
+  let grades = await gradeController.getAll();
+  return res.send(grades);
+});
 
 module.exports = router;

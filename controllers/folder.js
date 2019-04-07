@@ -44,6 +44,9 @@ const Controller = {
           reject(err);
         });
     });
+  },
+  changeName: (folderId, name) => {
+    return Folder.update({ name }, { where: { id: folderId } });
   }
 };
 

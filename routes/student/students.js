@@ -36,12 +36,11 @@ router.get("/logout", (req, res, next) => {
 });
 
 router.post("/register", async (req, res, next) => {
-  let gradeId = req.body.gradeId;
+  let gradeId = req.body.grade;
+  console.log(req.body);
   logger.logMessage("Trying to register new user: ");
-  req.body = req.body.student;
-  logger.logData(req.body);
 
-  const props = ["email", "firstName", "lastName", "password"];
+  const props = ["email", "firstName", "lastName", "password", "grade"];
 
   console.log(req.body);
   console.log(req.body.email);
@@ -57,8 +56,8 @@ router.post("/register", async (req, res, next) => {
           plain: true
         })
       );
-      GradeController.addStudent(user.get({ plain: true }).id, gradeId);
-      return res.send({ user: user.get({ plain: true }), gradeId });
+      await GradeController.addStudent(user.get({ plain: true }).id, gradeId);
+      return { status: true };
     } else {
       return res.status(403).send("User already exists");
     }

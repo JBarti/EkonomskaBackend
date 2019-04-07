@@ -71,6 +71,12 @@ router.post("/file", async (req, res, next) => {
   return res.send({ folderId, file });
 });
 
+router.delete("/file", async (req, res, next) => {
+  let { fileId, folderId } = req.body;
+  let status = await FileController.delete(fileId);
+  return res.send({ fileId, folderId });
+});
+
 router.post("/test", async (req, res, next) => {
   const { folderId, test } = req.body;
   let isNew = true;
@@ -99,9 +105,8 @@ router.post("/test", async (req, res, next) => {
     }
     return ids;
   };
-
   console.log(test.questions);
-  newTest = await TestController.create({ name: test.name });
+  newTest = await TestController.create({ name: test.name, isQuiz: test.isQuiz });
   logger.logData(newTest.get({ plain: true }));
   FolderController.addTest(newTest.get({ plain: true }).id, folderId);
 
@@ -120,6 +125,18 @@ router.post("/test", async (req, res, next) => {
   console.log(status);
   console.log(newTest);
   return res.send({ folderId, test: newTest, oldId: isNew ? -1 : test.id });
+});
+
+router.delete("/test", async (req, res, next) => {
+  const { testId, folderId } = req.body;
+  let status = await TestController.removeTest(testId);
+  return res.send({ testId, folderId });
+});
+
+router.post("/test/lock", async (req, res, next) => {
+  let { testId, folderId } = req.body;
+  let status = await TestController.lock(testId);
+  res.send({ testId, folderId });
 });
 
 router.post("/student", async (req, res, next) => {
@@ -166,6 +183,14 @@ router.post("/folder", async (req, res, next) => {
   logger.logData(folder);
   GradeController.addFolder(folder.id, gradeId);
   return res.send(folder);
+});
+
+router.post("/folder/update", async (req, res, next) => {
+  let { folderId, name } = req.body;
+  logger.logData(name);
+  console.log("\nWORKS");
+  FolderController.changeName(folderId, name);
+  return res.send({ folderId, name });
 });
 
 router.post("/grade", async (req, res, next) => {

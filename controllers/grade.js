@@ -13,6 +13,9 @@ const Controller = {
     });
     return Grade.find({ where: { id: gradeId }, include: include });
   },
+  getAll: () => {
+    return Grade.findAll();
+  },
   addStudent: (studentId, gradeId) => {
     logger.logData(gradeId);
     return new Promise((resolve, reject) => {

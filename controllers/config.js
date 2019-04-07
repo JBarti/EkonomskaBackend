@@ -13,7 +13,7 @@ try {
 } catch (error) {
   sequelize = new Sequelize("ekonomska", "postgres", "admin", {
     dialect: "postgres",
-    host: "localhost",
+    host: "0.0.0.0",
     port: 5432
   });
 }

@@ -15,6 +15,9 @@ const Controller = {
         id: fileId
       }
     });
+  },
+  delete: fileId => {
+    return File.destroy({ where: { id: fileId } });
   }
 };
 
