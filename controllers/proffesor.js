@@ -7,7 +7,9 @@ const {
   Question,
   Folder,
   Notification,
-  Solution
+  Solution,
+  Income,
+  Outcome
 } = require("./config");
 const StudentController = require("./student");
 const logger = require("../logger");
@@ -36,7 +38,7 @@ const Controller = {
             include: [
               {
                 model: Student,
-                include: [Solution]
+                include: [Solution, Income, Outcome]
               },
               { model: Notification },
               {

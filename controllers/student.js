@@ -7,7 +7,9 @@ const {
   Folder,
   Question,
   Solution,
-  Notification
+  Notification,
+  Outcome,
+  Income
 } = require("./config");
 const logger = require("../logger");
 const { sequelize } = require("./config");
@@ -36,6 +38,8 @@ const Controller = {
           "gradeId"
         ],
         include: [
+          { model: Outcome },
+          { model: Income },
           {
             model: Grade,
             include: [
@@ -90,6 +94,8 @@ const Controller = {
           "notifications"
         ],
         include: [
+          { model: Outcome },
+          { model: Income },
           {
             model: Grade,
             include: [
@@ -157,6 +163,34 @@ const Controller = {
         .then(student => {
           student.addFinance(financeId);
           resolve("added finance to student");
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  },
+  addIncome: (studentId, incomeId) => {
+    logger.logError(studentId);
+    logger.logData(incomeId);
+    return new Promise((resolve, reject) => {
+      Controller.getByIdSecond(studentId)
+        .then(student => {
+          student.addIncome(incomeId);
+          resolve("added income to student");
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  },
+  addOutcome: (studentId, outcomeId) => {
+    logger.logError(studentId);
+    logger.logData(outcomeId);
+    return new Promise((resolve, reject) => {
+      Controller.getByIdSecond(studentId)
+        .then(student => {
+          student.addOutcome(outcomeId);
+          resolve("added outcome to student");
         })
         .catch(err => {
           reject(err);

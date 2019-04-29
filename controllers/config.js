@@ -26,6 +26,8 @@ const File = require("../data/models/file")(sequelize, Sequelize);
 const Solution = require("../data/models/solution")(sequelize, Sequelize);
 const Proffesor = require("../data/models/proffesor")(sequelize, Sequelize);
 const Folder = require("../data/models/folder")(sequelize, Sequelize);
+const Income = require("../data/models/income")(sequelize, Sequelize);
+const Outcome = require("../data/models/outcome")(sequelize, Sequelize);
 const Notification = require("../data/models/notification")(
   sequelize,
   Sequelize
@@ -59,6 +61,8 @@ setup = () => {
   });
 
   Student.hasMany(Solution);
+  Student.hasMany(Income);
+  Student.hasMany(Outcome);
 
   Proffesor.hasMany(Grade);
 
@@ -78,6 +82,8 @@ module.exports = {
   Solution,
   Proffesor,
   Folder,
+  Outcome,
+  Income,
   Notification,
   setup: () => {
     return setup();
