@@ -259,34 +259,41 @@ module.exports = async () => {
   });
   status = await gradeController.addNotification(1, 1);
 
-  logger.logTest("Create income");
-  let job = await incomeController.create({
-    name: "Moj poslić",
-    amount: 2000,
-    type: "job"
-  });
-  let fee = await incomeController.create({
-    name: "Test1",
-    amount: 500,
-    type: "fee"
-  });
-  logger.logData(job.get({ plain: true }));
-  await studentController.addIncome(1, job.get({ plain: true }).id);
-  logger.logData(fee.get({ plain: true }));
-  await studentController.addIncome(1, fee.get({ plain: true }).id);
+  // logger.logTest("Create income");
+  // let job = await incomeController.create({
+  //   name: "Moj poslić",
+  //   amount: 2000,
+  //   type: "job",
+  //   year: 2
+  // });
+  // let fee = await incomeController.create({
+  //   name: "Test1",
+  //   amount: 500,
+  //   type: "fee",
+  //   year: 2
+  // });
+  // logger.logData(job.get({ plain: true }));
+  // //await studentController.addIncome(1, job.get({ plain: true }).id);
+  // logger.logData(fee.get({ plain: true }));
+  // //await studentController.addIncome(1, fee.get({ plain: true }).id);
 
-  logger.logTest("Create outcome");
-  let hrana = await outcomeController.create({
-    type: "Hrana",
-    amount: 500,
-    change: 0
-  });
-  let kredit = await outcomeController.create({ type: "Kredit", amount: 300 });
+  // logger.logTest("Create outcome");
+  // let hrana = await outcomeController.create({
+  //   type: "Hrana",
+  //   amount: 500,
+  //   change: 0,
+  //   year: 2
+  // });
+  // let kredit = await outcomeController.create({
+  //   type: "Kredit",
+  //   amount: 300,
+  //   year: 2
+  // });
 
-  logger.logData(hrana.get({ plain: true }));
-  await studentController.addOutcome(1, hrana.get({ plain: true }).id);
-  logger.logData(kredit.get({ plain: true }));
-  await studentController.addOutcome(1, kredit.get({ plain: true }).id);
+  // // logger.logData(hrana.get({ plain: true }));
+  // // await studentController.addOutcome(1, hrana.get({ plain: true }).id);
+  // // logger.logData(kredit.get({ plain: true }));
+  // // await studentController.addOutcome(1, kredit.get({ plain: true }).id);
 
   logger.logTest("Get grade");
   grade = await gradeController.get(1, [Student, Folder, Notification]);

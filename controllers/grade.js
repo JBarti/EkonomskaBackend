@@ -52,6 +52,9 @@ const Controller = {
           reject(err);
         });
     });
+  },
+  setFinancialYear: (financialYear, gradeId) => {
+    return Grade.update({ financialYear }, { where: { id: gradeId } });
   }
 };
 

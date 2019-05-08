@@ -3,6 +3,8 @@ const logger = require("../../logger");
 const StudentController = require("../../controllers/student");
 const TestController = require("../../controllers/test");
 const GradeController = require("../../controllers/grade");
+const outcomeController = require("../../controllers/outcome");
+const incomeController = require("../../controllers/income");
 const { passport, session } = require("../../auth");
 
 const router = express.Router();
@@ -57,7 +59,8 @@ router.post("/register", async (req, res, next) => {
         })
       );
       await GradeController.addStudent(user.get({ plain: true }).id, gradeId);
-      return { status: true };
+      logger.logMessage("RETURNAM");
+      return res.send({ user, gradeId });
     } else {
       return res.status(403).send("User already exists");
     }
@@ -81,6 +84,69 @@ router.post("/test/solve", async (req, res, next) => {
   logger.logMessage("Passing test solution");
   const status = await TestController.solveTest(req.body);
   return res.send(status);
+});
+
+router.post("/year/1", async (req, res, next) => {
+  logger.logMessage("Setting up year 1");
+  let { jobPayment, jobCredit, jobName, studentId } = req.body;
+
+  logger.logTest("Create income");
+  let job = await incomeController.create({
+    name: jobName,
+    amount: jobPayment,
+    type: "job",
+    year: 1
+  });
+  logger.logData(job.get({ plain: true }));
+  await StudentController.addIncome(studentId, job.get({ plain: true }).id);
+
+  logger.logTest("Create outcome");
+
+  var hrana = await outcomeController.create({
+    type: "Hrana",
+    amount: 500,
+    change: 0,
+    year: 1
+  });
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  var hrana = await outcomeController.create({
+    type: "Režije",
+    amount: 400,
+    change: 0,
+    year: 1
+  });
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  var hrana = await outcomeController.create({
+    type: "Potrepštine",
+    amount: 100,
+    change: 0,
+    year: 1
+  });
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  var hrana = await outcomeController.create({
+    type: "Kava",
+    amount: 50,
+    change: 0,
+    year: 1
+  });
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  var hrana = await outcomeController.create({
+    type: "Higijena",
+    amount: 100,
+    change: 0,
+    year: 1
+  });
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  let kredit = await outcomeController.create({
+    type: "Kredit",
+    amount: jobCredit,
+    year: 1
+  });
+
+  logger.logData(hrana.get({ plain: true }));
+  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  logger.logData(kredit.get({ plain: true }));
+  await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
 });
 
 module.exports = router;

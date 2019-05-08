@@ -17,6 +17,10 @@ module.exports = (sequelize, types) => {
     type: {
       type: types.ENUM("job", "fee"),
       allowNull: false
+    },
+    year: {
+      type: types.INTEGER,
+      allowNull: false
     }
   });
 };

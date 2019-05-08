@@ -106,7 +106,10 @@ router.post("/test", async (req, res, next) => {
     return ids;
   };
   console.log(test.questions);
-  newTest = await TestController.create({ name: test.name, isQuiz: test.isQuiz });
+  newTest = await TestController.create({
+    name: test.name,
+    isQuiz: test.isQuiz
+  });
   logger.logData(newTest.get({ plain: true }));
   FolderController.addTest(newTest.get({ plain: true }).id, folderId);
 
@@ -226,6 +229,13 @@ router.delete("/notifications", async (req, res, next) => {
   let { notificationId } = req.body;
   let status = await NotificationController.removeNotification(notificationId);
   return res.send({ notificationId });
+});
+
+router.post("/financialYear", async (req, res, next) => {
+  let { financialYear, gradeId } = req.body;
+  logger.logMessage("INCREMENT");
+  GradeController.setFinancialYear(financialYear, gradeId);
+  return res.send({ financialYear, gradeId });
 });
 
 module.exports = router;

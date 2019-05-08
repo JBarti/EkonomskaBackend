@@ -28,6 +28,10 @@ module.exports = (sequelize, types) => {
         "Neočekivano"
       ),
       allowNull: false
+    },
+    year: {
+      type: types.INTEGER,
+      allowNull: false
     }
   });
 };

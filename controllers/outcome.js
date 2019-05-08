@@ -12,8 +12,8 @@ const Controller = {
     "Kredit",
     "Neočekivano"
   ],
-  create: ({ amount, type, change = null }) => {
-    return Outcome.create({ amount, type, change });
+  create: ({ amount, type, year, change = null }) => {
+    return Outcome.create({ amount, type, change, year });
   },
 
   get: id => {
