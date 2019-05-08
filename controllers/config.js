@@ -67,7 +67,7 @@ setup = () => {
   Proffesor.hasMany(Grade);
 
   return sequelize.sync({
-    force: false
+    force: true
   });
 };
 
