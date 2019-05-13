@@ -27,6 +27,8 @@ setup().then(data => {
   require("./controllers/unitTest")();
 });
 
+app.use("/static", express.static("post"));
+
 app.use(express.json());
 app.use(
   express.urlencoded({

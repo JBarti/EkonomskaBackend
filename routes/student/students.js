@@ -100,53 +100,34 @@ router.post("/year/1", async (req, res, next) => {
   logger.logData(job.get({ plain: true }));
   await StudentController.addIncome(studentId, job.get({ plain: true }).id);
 
-  logger.logTest("Create outcome");
+  let outcomes = outcomeController.types.slice(0, 7);
+  let newOutcomes = [];
+  for (let outcomeType in outcomes) {
+    console.log(outcomeType);
+    let outcome = await outcomeController.create({
+      type: outcomes[outcomeType],
+      amount: Math.ceil(Math.random() * 400 + 300),
+      change: 0,
+      year: 1
+    });
+    await StudentController.addOutcome(
+      studentId,
+      outcome.get({ plain: true }).id
+    );
+    newOutcomes.push(outcome.get({ plain: true }));
+  }
 
-  var hrana = await outcomeController.create({
-    type: "Hrana",
-    amount: 500,
-    change: 0,
-    year: 1
-  });
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
-  var hrana = await outcomeController.create({
-    type: "Režije",
-    amount: 400,
-    change: 0,
-    year: 1
-  });
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
-  var hrana = await outcomeController.create({
-    type: "Potrepštine",
-    amount: 100,
-    change: 0,
-    year: 1
-  });
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
-  var hrana = await outcomeController.create({
-    type: "Kava",
-    amount: 50,
-    change: 0,
-    year: 1
-  });
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
-  var hrana = await outcomeController.create({
-    type: "Higijena",
-    amount: 100,
-    change: 0,
-    year: 1
-  });
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  console.log(newOutcomes);
+
   let kredit = await outcomeController.create({
     type: "Kredit",
     amount: jobCredit,
     year: 1
   });
-
-  logger.logData(hrana.get({ plain: true }));
-  await StudentController.addOutcome(studentId, hrana.get({ plain: true }).id);
+  newOutcomes.push(kredit.get({ plain: true }));
   logger.logData(kredit.get({ plain: true }));
   await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
+  return res.send({ outcomes: newOutcomes, job: job });
 });
 
 module.exports = router;

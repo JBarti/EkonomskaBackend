@@ -9,8 +9,8 @@ const Controller = {
     "Higijena",
     "Kava",
     "Prijevoz",
-    "Kredit",
-    "Neočekivano"
+    "Neočekivano",
+    "Kredit"
   ],
   create: ({ amount, type, year, change = null }) => {
     return Outcome.create({ amount, type, change, year });

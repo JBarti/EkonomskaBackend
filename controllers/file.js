@@ -4,9 +4,8 @@ const Controller = {
   create: ({ name, url, type = "pdf", active = true }) => {
     return File.create({
       name,
-      active,
       url,
-      type
+      active
     });
   },
   get: fileId => {

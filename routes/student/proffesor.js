@@ -9,6 +9,17 @@ const TestController = require("../../controllers/test");
 const QuestionController = require("../../controllers/question");
 const FolderController = require("../../controllers/folder");
 const router = express.Router();
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, "./post/");
+  },
+  filename: function(req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+var uploading = multer({ storage: storage });
 
 router.get("/test", (req, res, next) => {
   return res.send("test");
@@ -60,12 +71,15 @@ router.use(async (req, res, next) => {
     : res.status(401).send("Unauthorized access");
 });
 
-router.post("/file", async (req, res, next) => {
+router.post("/file", uploading.single("uploadFile"), async (req, res, next) => {
   logger.logMessage("TRYING TO ADD FILE");
-  let { pdf, folderId } = req.body;
-  let { name, url } = pdf;
-  link = url;
-  let file = await FileController.create({ name, url: link });
+  let { folderId } = req.body;
+  let name = req.file.originalname;
+
+  let hostname = req.headers.host; // hostname = 'localhost:8080'
+  let url = "http://" + hostname + "/static/" + req.file.filename;
+
+  let file = await FileController.create({ name, url });
   file = file.get({ plain: true });
   await FolderController.addFile(file.id, folderId);
   return res.send({ folderId, file });
