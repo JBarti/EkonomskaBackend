@@ -251,6 +251,34 @@ module.exports = async () => {
     password: "prof"
   });
 
+  var proffesor = await proffesorController.create({
+    firstName: "Ante",
+    lastName: "Bartulović",
+    email: "prof1",
+    password: "prof1"
+  });
+
+  var proffesor = await proffesorController.create({
+    firstName: "Ante",
+    lastName: "Bartulović",
+    email: "prof2",
+    password: "prof2"
+  });
+
+  var proffesor = await proffesorController.create({
+    firstName: "Ante",
+    lastName: "Bartulović",
+    email: "prof3",
+    password: "prof3"
+  });
+
+  var proffesor = await proffesorController.create({
+    firstName: "Ante",
+    lastName: "Bartulović",
+    email: "prof4",
+    password: "prof4"
+  });
+
   logger.logData(
     proffesor.get({
       plain: true
