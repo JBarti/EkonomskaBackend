@@ -15,7 +15,7 @@ router.post("/login", [
       logger.logText(`User logged in`);
       logger.logData(user);
       if (err) {
-        logger.logText("GOT AN ERROR");
+        logger.logText("GOT AN ERROR PROFESOR");
         logger.logError(err);
         return next();
       }
@@ -31,11 +31,12 @@ router.post("/login", [
   },
 
   (req, res, next) => {
+    console.log("POZVAN SAM");
     passport.authenticate("student", (err, user, info) => {
       logger.logText(`User logged in`);
       logger.logData(user);
       if (err) {
-        logger.logText("GOT AN ERROR");
+        logger.logText("\n\n\nGOT AN ERROR STUDENT");
         logger.logError(err);
         return res.status(400).send({
           error: "User not found"

@@ -21,6 +21,7 @@ createAuthPoint = (userType, UserController) => {
           user = await UserController.get(email, password);
         } catch (error) {
           logger.logError(error);
+          logger.logMessage("AUTH ERROR");
         }
         if (user) {
           user.type = userType;

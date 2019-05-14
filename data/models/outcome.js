@@ -32,6 +32,10 @@ module.exports = (sequelize, types) => {
     year: {
       type: types.INTEGER,
       allowNull: false
+    },
+    duration: {
+      type: types.INTEGER,
+      allowNull: true
     }
   });
 };

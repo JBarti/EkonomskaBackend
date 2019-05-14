@@ -55,16 +55,20 @@ const Controller = {
           email: email,
           password: password
         }
-      }).then(student => {
-        Controller.getSolutions(student.id).then(solutions => {
-          student = student.get({ plain: true });
-          console.log("\n\n");
-          console.log(solutions);
-          console.log("\n\n");
-          student.solutions = solutions;
-          resolve(student);
+      })
+        .then(student => {
+          Controller.getSolutions(student.id).then(solutions => {
+            student = student.get({ plain: true });
+            console.log("\n\n");
+            console.log(solutions);
+            console.log("\n\n");
+            student.solutions = solutions;
+            resolve(student);
+          });
+        })
+        .catch(error => {
+          reject("Could not find student");
         });
-      });
     });
   },
   getByIdSecond: id => {

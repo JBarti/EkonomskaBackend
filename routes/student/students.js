@@ -21,8 +21,12 @@ router.get("/", async (req, res, next) => {
   logger.logMessage("Retrieved user data");
   logger.logData(user);
   if (user) {
-    let newUser = await StudentController.getById(user.id);
-    return res.send(newUser);
+    try {
+      let newUser = await StudentController.getById(user.id);
+      return res.send(newUser);
+    } catch (error) {
+      return res.status(403).send("User not logged in");
+    }
   }
   return res.status(403).send("User not logged in");
 });
@@ -122,12 +126,29 @@ router.post("/year/1", async (req, res, next) => {
   let kredit = await outcomeController.create({
     type: "Kredit",
     amount: jobCredit,
-    year: 1
+    year: 1,
+    duration: 5
   });
   newOutcomes.push(kredit.get({ plain: true }));
   logger.logData(kredit.get({ plain: true }));
   await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
   return res.send({ outcomes: newOutcomes, job: job });
+});
+
+router.post("/year/2", async (req, res, next) => {
+  logger.logMessage("Setting up year 1");
+  let { studentId } = req.body;
+
+  let kredit = await outcomeController.create({
+    type: "Neočekivano",
+    amount: 5760,
+    year: 2,
+    duration: 3
+  });
+
+  logger.logData(kredit.get({ plain: true }));
+  await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
+  return res.send({ outcome: kredit.get({ plain: true }) });
 });
 
 module.exports = router;

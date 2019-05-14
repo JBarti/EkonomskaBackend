@@ -12,8 +12,7 @@ module.exports = (sequelize, types) => {
     },
     financialYear: {
       type: types.INTEGER,
-      allowNull: true,
-      defaultValue: 1
+      allowNull: true
     }
   });
 };

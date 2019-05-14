@@ -223,12 +223,34 @@ module.exports = async () => {
   );
 
   logger.logTest("Create Proffesor");
-  let proffesor = await proffesorController.create({
+  var proffesor = await proffesorController.create({
+    firstName: "Anita",
+    lastName: "Grgić",
+    email: "profGrgić",
+    password: "aGrgić"
+  });
+
+  var proffesor = await proffesorController.create({
+    firstName: "Klaudija",
+    lastName: "Dimić",
+    email: "profDimić",
+    password: "kDimić"
+  });
+
+  var proffesor = await proffesorController.create({
+    firstName: "Sandra",
+    lastName: "Gašparić",
+    email: "profGašparić",
+    password: "sGašparić"
+  });
+
+  var proffesor = await proffesorController.create({
     firstName: "Ante",
     lastName: "Bartulović",
     email: "profBartulović",
     password: "prof"
   });
+
   logger.logData(
     proffesor.get({
       plain: true
