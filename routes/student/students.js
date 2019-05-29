@@ -63,7 +63,38 @@ router.post("/register", async (req, res, next) => {
         })
       );
       await GradeController.addStudent(user.get({ plain: true }).id, gradeId);
-      logger.logMessage("RETURNAM");
+
+      let studentId = user.get({ plain: true }).id;
+      let outcomes = outcomeController.types.slice(0, 7);
+      let outcomePrices = [1800, 1500, 500, 400, 200, 100, 500];
+      let newOutcomes = [];
+      for (let outcomeType in outcomes) {
+        for (let year in [1, 2, 3, 4, 5, 6, 7]) {
+          let outcome = await outcomeController.create({
+            type: outcomes[outcomeType],
+            amount: outcomePrices[outcomeType],
+            change: 0,
+            year: Number(year) + 1,
+            duration: 1
+          });
+          await StudentController.addOutcome(
+            studentId,
+            outcome.get({ plain: true }).id
+          );
+          newOutcomes.push(outcome.get({ plain: true }));
+        }
+      }
+
+      logger.logTest("Create income");
+      let job = await incomeController.create({
+        name: "Posao",
+        amount: 4200,
+        type: "job",
+        year: 1
+      });
+      logger.logData(job.get({ plain: true }));
+      await StudentController.addIncome(studentId, job.get({ plain: true }).id);
+
       return res.send({ user, gradeId });
     } else {
       return res.status(403).send("User already exists");
@@ -86,8 +117,28 @@ router.get("/get", (req, res, next) => {
 
 router.post("/test/solve", async (req, res, next) => {
   logger.logMessage("Passing test solution");
-  const status = await TestController.solveTest(req.body);
-  return res.send(status);
+  let solution = await TestController.solveTest(req.body);
+  status = solution.get({ plain: true });
+  res.send(status);
+  logger.logData(solution);
+  let test = await TestController.get(status.testId);
+  test = test.get({ plain: true });
+  logger.logData(test.questions);
+  if (test.isQuiz) {
+    let percent = solution.points / test.questions.length;
+    if (percent >= 0.5) {
+      let money = Math.round(5 + (percent - 0.5) * 40);
+      let year = Math.round(Math.random() * 7);
+      let income = await incomeController.create({
+        name: test.name,
+        amount: money,
+        type: "fee",
+        year: year
+      });
+      await StudentController.addIncome(req.body.studentId, income.id);
+    }
+  }
+  return;
 });
 
 router.post("/year/1", async (req, res, next) => {
@@ -97,31 +148,12 @@ router.post("/year/1", async (req, res, next) => {
   logger.logTest("Create income");
   let job = await incomeController.create({
     name: jobName,
-    amount: jobPayment,
-    type: "job",
+    amount: jobPayment - 4200,
+    type: "fee",
     year: 1
   });
   logger.logData(job.get({ plain: true }));
   await StudentController.addIncome(studentId, job.get({ plain: true }).id);
-
-  let outcomes = outcomeController.types.slice(0, 7);
-  let newOutcomes = [];
-  for (let outcomeType in outcomes) {
-    console.log(outcomeType);
-    let outcome = await outcomeController.create({
-      type: outcomes[outcomeType],
-      amount: Math.ceil(Math.random() * 400 + 300),
-      change: 0,
-      year: 1
-    });
-    await StudentController.addOutcome(
-      studentId,
-      outcome.get({ plain: true }).id
-    );
-    newOutcomes.push(outcome.get({ plain: true }));
-  }
-
-  console.log(newOutcomes);
 
   let kredit = await outcomeController.create({
     type: "Kredit",
@@ -129,10 +161,10 @@ router.post("/year/1", async (req, res, next) => {
     year: 1,
     duration: 5
   });
-  newOutcomes.push(kredit.get({ plain: true }));
+
   logger.logData(kredit.get({ plain: true }));
   await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
-  return res.send({ outcomes: newOutcomes, job: job });
+  return res.send({ outcomes: kredit, job: job });
 });
 
 router.post("/year/2", async (req, res, next) => {
@@ -141,7 +173,7 @@ router.post("/year/2", async (req, res, next) => {
 
   let kredit = await outcomeController.create({
     type: "Neočekivano",
-    amount: 5760,
+    amount: 5760 / 3,
     year: 2,
     duration: 3
   });
@@ -149,6 +181,12 @@ router.post("/year/2", async (req, res, next) => {
   logger.logData(kredit.get({ plain: true }));
   await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
   return res.send({ outcome: kredit.get({ plain: true }) });
+});
+
+router.post("/outcomes", async (req, res, next) => {
+  let { outcomes } = req.body;
+  await outcomeController.changeAmount(outcomes);
+  return res.send("DONE");
 });
 
 module.exports = router;

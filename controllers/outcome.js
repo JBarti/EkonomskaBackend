@@ -18,6 +18,13 @@ const Controller = {
 
   get: id => {
     return Outcome.find({ where: { id: id } });
+  },
+
+  changeAmount: async outcomes => {
+    outcomes.forEach(async outcome => {
+      let { change, id } = outcome;
+      await Outcome.update({ change }, { where: { id } });
+    });
   }
 };
 

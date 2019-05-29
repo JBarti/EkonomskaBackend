@@ -144,7 +144,8 @@ module.exports = async () => {
   logger.logTest("Create test");
   let test = await testController.create({
     name: "testing test",
-    active: true
+    active: true,
+    isQuiz: true
   });
   logger.logData(
     test.get({
@@ -223,26 +224,26 @@ module.exports = async () => {
   );
 
   logger.logTest("Create Proffesor");
-  var proffesor = await proffesorController.create({
-    firstName: "Anita",
-    lastName: "Grgić",
-    email: "profGrgić",
-    password: "aGrgić"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Anita",
+  //   lastName: "Grgić",
+  //   email: "profGrgić",
+  //   password: "aGrgić"
+  // });status
 
-  var proffesor = await proffesorController.create({
-    firstName: "Klaudija",
-    lastName: "Dimić",
-    email: "profDimić",
-    password: "kDimić"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Klaudija",
+  //   lastName: "Dimić",
+  //   email: "profDimić",
+  //   password: "kDimić"
+  // });
 
-  var proffesor = await proffesorController.create({
-    firstName: "Sandra",
-    lastName: "Gašparić",
-    email: "profGašparić",
-    password: "sGašparić"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Sandra",
+  //   lastName: "Gašparić",
+  //   email: "profGašparić",
+  //   password: "sGašparić"
+  // });
 
   var proffesor = await proffesorController.create({
     firstName: "Ante",
@@ -251,33 +252,52 @@ module.exports = async () => {
     password: "prof"
   });
 
-  var proffesor = await proffesorController.create({
-    firstName: "Ante",
-    lastName: "Bartulović",
-    email: "prof1",
-    password: "prof1"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Ante",
+  //   lastName: "Bartulović",
+  //   email: "prof1",
+  //   password: "prof1"
+  // });
 
-  var proffesor = await proffesorController.create({
-    firstName: "Ante",
-    lastName: "Bartulović",
-    email: "prof2",
-    password: "prof2"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Ante",
+  //   lastName: "Bartulović",
+  //   email: "prof2",
+  //   password: "prof2"
+  // });
 
-  var proffesor = await proffesorController.create({
-    firstName: "Ante",
-    lastName: "Bartulović",
-    email: "prof3",
-    password: "prof3"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Ante",
+  //   lastName: "Bartulović",
+  //   email: "prof3",
+  //   password: "prof3"
+  // });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Anita",
+  //   lastName: "Grgić",
+  //   email: "profGrgić",
+  //   password: "aGrgić"
+  // });status
 
-  var proffesor = await proffesorController.create({
-    firstName: "Ante",
-    lastName: "Bartulović",
-    email: "prof4",
-    password: "prof4"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Klaudija",
+  //   lastName: "Dimić",
+  //   email: "profDimić",
+  //   password: "kDimić"
+  // });
+
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Sandra",
+  //   lastName: "Gašparić",
+  //   email: "profGašparić",
+  //   password: "sGašparić"
+  // });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Ante",
+  //   lastName: "Bartulović",
+  //   email: "prof4",
+  //   password: "prof4"
+  // });
 
   logger.logData(
     proffesor.get({
