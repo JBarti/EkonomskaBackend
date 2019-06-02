@@ -71,9 +71,9 @@ router.post("/register", async (req, res, next) => {
       for (let outcomeType in outcomes) {
         for (let year in [1, 2, 3, 4, 5, 6, 7]) {
           let outcome = await outcomeController.create({
-            type: outcomes[outcomeType],
+            type: outcomes[outcomeType].name,
             amount: outcomePrices[outcomeType],
-            change: 0,
+            change: outcomes[outcomeType].locked ? null : 0,
             year: Number(year) + 1,
             duration: 1
           });
@@ -88,7 +88,7 @@ router.post("/register", async (req, res, next) => {
       logger.logTest("Create income");
       let job = await incomeController.create({
         name: "Posao",
-        amount: 4200,
+        amount: 5000,
         type: "job",
         year: 1
       });
@@ -148,7 +148,7 @@ router.post("/year/1", async (req, res, next) => {
   logger.logTest("Create income");
   let job = await incomeController.create({
     name: jobName,
-    amount: jobPayment - 4200,
+    amount: jobPayment - 5000,
     type: "fee",
     year: 1
   });
@@ -169,13 +169,13 @@ router.post("/year/1", async (req, res, next) => {
 
 router.post("/year/2", async (req, res, next) => {
   logger.logMessage("Setting up year 1");
-  let { studentId } = req.body;
+  let { studentId, outcome, duration } = req.body;
 
   let kredit = await outcomeController.create({
     type: "Neočekivano",
-    amount: 5760 / 3,
+    amount: outcome / duration,
     year: 2,
-    duration: 3
+    duration: duration
   });
 
   logger.logData(kredit.get({ plain: true }));
