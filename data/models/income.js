@@ -15,7 +15,7 @@ module.exports = (sequelize, types) => {
       allowNull: false
     },
     type: {
-      type: types.ENUM("job", "fee"),
+      type: types.ENUM("job", "fee", "saving"),
       allowNull: false
     },
     year: {

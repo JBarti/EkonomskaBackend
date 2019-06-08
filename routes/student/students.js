@@ -168,12 +168,12 @@ router.post("/year/1", async (req, res, next) => {
 });
 
 router.post("/year/2", async (req, res, next) => {
-  logger.logMessage("Setting up year 1");
+  logger.logMessage("Setting up year 2");
   let { studentId, outcome, duration } = req.body;
 
   let kredit = await outcomeController.create({
     type: "Neočekivano",
-    amount: outcome / duration,
+    amount: outcome / duration / 12,
     year: 2,
     duration: duration
   });
@@ -181,6 +181,42 @@ router.post("/year/2", async (req, res, next) => {
   logger.logData(kredit.get({ plain: true }));
   await StudentController.addOutcome(studentId, kredit.get({ plain: true }).id);
   return res.send({ outcome: kredit.get({ plain: true }) });
+});
+
+router.post("/year/3", async (req, res, next) => {
+  logger.logMessage("Setting up year 3");
+  let { studentId, totalSavings, interestRate } = req.body;
+
+  console.log(totalSavings);
+  console.log(interestRate);
+
+  if (totalSavings <= 0) {
+    let saving = await incomeController.create({
+      type: "saving",
+      name: "Ulaganje",
+      amount: 0,
+      year: 0,
+      duration: 0
+    });
+
+    await StudentController.addIncome(
+      studentId,
+      saving.get({ plain: true }).id
+    );
+
+    return res.send({ saving: saving.get({ plain: true }) });
+  }
+
+  let saving = await incomeController.create({
+    type: "saving",
+    name: "Ulaganje",
+    amount: totalSavings * Math.pow(1 + 1 / interestRate, 3),
+    year: 7,
+    duration: 1
+  });
+
+  await StudentController.addIncome(studentId, saving.get({ plain: true }).id);
+  return res.send({ saving: saving.get({ plain: true }) });
 });
 
 router.post("/outcomes", async (req, res, next) => {
