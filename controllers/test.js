@@ -55,7 +55,11 @@ const Controller = {
           let question = test.questions.filter(
             question => question.id == questionId
           )[0];
-          points += question.answers[answerIndex].isCorrect;
+          try {
+            points += question.answers[answerIndex].isCorrect;
+          } catch (err) {
+            points += 0;
+          }
         });
         console.log(points);
         Controller.createSolution(testId, answers, points, studentId)

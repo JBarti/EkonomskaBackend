@@ -38,7 +38,11 @@ const Controller = {
             include: [
               {
                 model: Student,
-                include: [Solution, Income, Outcome]
+                include: [
+                  { model: Solution },
+                  { model: Income },
+                  { model: Outcome }
+                ]
               },
               { model: Notification },
               {
@@ -84,7 +88,7 @@ const Controller = {
             include: [
               {
                 model: Student,
-                include: []
+                include: [Outcome, Income]
               },
               { model: Notification },
               {

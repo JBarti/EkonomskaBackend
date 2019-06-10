@@ -231,12 +231,12 @@ module.exports = async () => {
   //   password: "aGrgić"
   // });status
 
-  // var proffesor = await proffesorController.create({
-  //   firstName: "Klaudija",
-  //   lastName: "Dimić",
-  //   email: "profDimić",
-  //   password: "kDimić"
-  // });
+  var proffesor = await proffesorController.create({
+    firstName: "Klaudija",
+    lastName: "Dimić",
+    email: "profDimić",
+    password: "kDimić"
+  });
 
   // var proffesor = await proffesorController.create({
   //   firstName: "Sandra",
