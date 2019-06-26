@@ -210,7 +210,7 @@ router.post("/year/3", async (req, res, next) => {
   let saving = await incomeController.create({
     type: "saving",
     name: "Ulaganje",
-    amount: totalSavings * Math.pow(1 + 1 / interestRate, 3),
+    amount: totalSavings * Math.pow(1 + interestRate / 100, 3),
     year: 7,
     duration: 1
   });
