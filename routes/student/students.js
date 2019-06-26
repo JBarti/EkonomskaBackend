@@ -159,7 +159,7 @@ router.post("/year/1", async (req, res, next) => {
     type: "Kredit",
     amount: jobCredit,
     year: 1,
-    duration: 5
+    duration: 4
   });
 
   logger.logData(kredit.get({ plain: true }));
