@@ -171,9 +171,12 @@ router.post("/year/2", async (req, res, next) => {
   logger.logMessage("Setting up year 2");
   let { studentId, outcome, duration } = req.body;
 
+  avarageOutcome = outcome;
+  realOutcome = Math.round(outcome - outcome * Math.random() * 0.03);
+
   let kredit = await outcomeController.create({
     type: "Neočekivano",
-    amount: outcome / duration / 12,
+    amount: realOutcome / duration / 12,
     year: 2,
     duration: duration
   });
@@ -210,8 +213,8 @@ router.post("/year/3", async (req, res, next) => {
   let saving = await incomeController.create({
     type: "saving",
     name: "Ulaganje",
-    amount: totalSavings * Math.pow(1 + interestRate / 100, 3),
-    year: 7,
+    amount: totalSavings * Math.pow(1 + interestRate / 100, 1),
+    year: 6,
     duration: 1
   });
 

@@ -134,8 +134,6 @@ router.post("/test", async (req, res, next) => {
     isNew = false;
   }
 
-  console.log("AJDIEVI", newIds);
-
   let status = await TestController.setQuestions(newIds, newTest.id);
   newTest = await TestController.get(newTest.id);
   console.log("\n\n\n");
@@ -249,7 +247,48 @@ router.post("/financialYear", async (req, res, next) => {
   let { financialYear, gradeId } = req.body;
   logger.logMessage("INCREMENT");
   GradeController.setFinancialYear(financialYear, gradeId);
-  return res.send({ financialYear, gradeId });
+  res.send({ financialYear, gradeId });
+
+  let notification = undefined;
+
+  if (financialYear === 1) {
+    notification = await NotificationController.create({
+      title: "Prvi izazovi",
+      description: `
+      Pokušajte smanjiniti vaše rashode za pojedinu godinu. 
+      Pazite da pohranite sve promjene prije izlaska iz aplikacije!
+      Za dodatne honorarne prihode profesor vam može zadati kviz.
+      `
+    });
+  } else if (financialYear === 2) {
+    notification = await NotificationController.create({
+      title: "Neplanirani rashod",
+      description: `
+      Neplanirani rashodi znaju se svima dogoditi.
+      Možda trebate još smanjiti vaše izdatke.
+      `
+    });
+  } else if (financialYear === 3) {
+    notification = await NotificationController.create({
+      title: "Kraj",
+      description: `
+      Došlo je vrijeme da uberete plodove vašeg rada.
+      Ovisno o vašim predhodnim odlukama dospili ste u trenutno
+      financijsko stanje.
+      Ako ste ispravno birali uspjeli ste skupiti dovoljno novca za laptop.
+      `
+    });
+  }
+
+  console.log("\n\n");
+  console.log(notification);
+
+  if (notification) {
+    console.log("IT IZ");
+    GradeController.addNotification(notification.id, gradeId);
+  }
+
+  return;
 });
 
 module.exports = router;
