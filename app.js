@@ -1,26 +1,21 @@
 //Dependencies
-var createError = require("http-errors");
-var express = require("express");
-var cookieParser = require("cookie-parser");
-var logger = require("./logger");
-var bodyParser = require("body-parser");
-var passport = require("passport");
-var LocalStrategy = require("passport-local").Strategy;
-var expressSession = require("express-session");
-var FileStore = require("session-file-store")(expressSession);
-var { passport, session } = require("./auth");
-var cors = require("cors");
+let createError = require("http-errors");
+let express = require("express");
+let logger = require("./logger");
+let bodyParser = require("body-parser");
+let session = require("express-session");
+let cors = require("cors");
 
 //Routes
-var indexRouter = require("./routes/student/index");
-var studentRouter = require("./routes/student/students");
-var proffesorRouter = require("./routes/student/proffesor");
+let indexRouter = require("./routes/student/index");
+let studentRouter = require("./routes/student/students");
+let proffesorRouter = require("./routes/student/proffesor");
 
-var app = express();
+let app = express();
 
 app.disable("x-powered-by");
 
-var { setup } = require("./controllers/config");
+let { setup } = require("./controllers/config");
 
 setup().then(data => {
   logger.logMessage("Created databse");
@@ -35,12 +30,15 @@ app.use(
     extended: false
   })
 );
-app.use(cookieParser());
-app.use(bodyParser());
 
-app.use(session);
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(bodyParser());
+app.use(session({
+  secret: 'ssshhhhh',
+  saveUninitialized: true,
+  resave: true,
+  loggedIn: true
+})
+);
 
 let corsOptions = {
   origin: true,
@@ -68,7 +66,7 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error pageć
+  // render the error page
   res.status(err.status || 500);
   res.send(err);
 });

@@ -26,25 +26,13 @@ router.get("/test", (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
-  console.log("GETN");
-  let user = {};
+  const { userId } = req.session;
+  if (userId) {
+    const proffesor = await ProffesorController.getById(userId);
+    if(proffesor) return res.send({user: proffesor.get({plain: true}), type: "PROFFESOR"});
+  }
 
-  try {
-    user = JSON.parse(req.user);
-  } catch (error) {
-    return res.status(403).send("0");
-  }
-  console.log(user.id);
-  if (!user.type === "student") {
-    return res.status(401).send("User not logged in");
-  }
-  logger.logData(user);
-  if (user) {
-    logger.logMessage("Retrieved user data");
-    user = await ProffesorController.getById(user.id);
-    return res.send(user.get({ plain: true }));
-  }
-  return res.status(401).send("User not logged in");
+  return res.status(403).send();
 });
 
 router.get("/logout", (req, res, next) => {
@@ -65,8 +53,11 @@ router.get("/get", (req, res, next) => {
 });
 
 router.use(async (req, res, next) => {
-  user = JSON.parse(req.user);
-  return user.type !== "student"
+  let userId = req.session.userId;
+  let userType = req.session.userType;
+  console.log(userId, userType);
+  console.log("DASPDJASPŠJDSPJŠDPSDJASJDA DRKICA");
+  return userId && userType !== "student"
     ? next()
     : res.status(401).send("Unauthorized access");
 });
@@ -155,14 +146,14 @@ router.post("/test/lock", async (req, res, next) => {
 });
 
 router.post("/student", async (req, res, next) => {
-  let { firstName, lastName, email, password } = req.body;
+  let { firstName, lastName, email, password, gradeId } = req.body;
   let student = await StudentController.create({
     firstName,
     lastName,
     email,
     password
   });
-  let status = await GradeController.addStudent(student.id, req.body.gradeId);
+  let status = await GradeController.addStudent(student.id, gradeId);
   logger.logMessage(status);
   return res.send(student);
 });
@@ -209,9 +200,9 @@ router.post("/folder/update", async (req, res, next) => {
 });
 
 router.post("/grade", async (req, res, next) => {
+  console.log("WATAFAK");
   let { name, proffesorId } = req.body;
   let grade = await GradeController.create({ name });
-  console.log(grade);
   let x = await ProffesorController.addGrade(proffesorId, grade.id);
   return res.send({ grade: grade.get({ plain: true }) });
 });

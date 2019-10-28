@@ -1,59 +1,49 @@
-var express = require("express");
-var router = express.Router();
-var logger = require("../../logger");
-var { passport, session } = require("../../auth");
-var gradeController = require("../../controllers/grade");
+let express = require("express");
+let gradeController = require("../../controllers/grade");
+let studentController = require("../../controllers/student");
+let proffesorController = require("../../controllers/proffesor");
+
+let router = express.Router();
 
 /* GET home page. */
 router.get("/test", (req, res, next) => {
   res.send("Works");
 });
 
-router.post("/login", [
-  (req, res, next) => {
-    passport.authenticate("proffesor", (err, user, info) => {
-      logger.logText(`User logged in`);
-      logger.logData(user);
-      if (err) {
-        logger.logText("GOT AN ERROR PROFESOR");
-        logger.logError(err);
-        return next();
-      }
-      req.login(user, err => {
-        if (!user) {
-          return next();
-        }
-        logger.logMessage("User credentials set to:");
-        logger.logData(user);
-        return res.send(user);
-      });
-    })(req, res, next);
-  },
 
-  (req, res, next) => {
-    console.log("POZVAN SAM");
-    passport.authenticate("student", (err, user, info) => {
-      logger.logText(`User logged in`);
-      logger.logData(user);
-      if (err) {
-        logger.logText("\n\n\nGOT AN ERROR STUDENT");
-        logger.logError(err);
-        return res.status(400).send({
-          error: "User not found"
-        });
-      }
-      req.login(user, err => {
-        if (!user)
-          return res.status(400).send({
-            error: "Invalid credentials"
-          });
-        logger.logMessage("User credentials set to:");
-        logger.logData(user);
-        return res.send(user);
-      });
-    })(req, res, next);
+router.get("/login", async (req, res, next) => {
+  const credentials_base64 = req.headers.authorization.split(" ")[1];
+  const credentials = Buffer.from(credentials_base64, "base64").toString("utf-8");
+  const [email, password] = credentials.split(":");
+  let user = undefined;
+  try {
+    user = await studentController.get(email, password);
+    req.session.userId = user.id;
+    req.session.userType = "student";
+    if(user) return res.send({user: user, type: "STUDENT"});
+  } catch (e) {}
+
+  try {
+    user = await proffesorController.get(email, password);
+    req.session.userId = user.id;
+    req.session.userType = "proffesor";
+    if(user) return res.send({user: user, type: "PROFFESOR"});
+  }catch (e) {}
+
+  return res.status(401).send();
+});
+
+
+router.get("/logout", (req, res, next) => {
+  try{
+    req.session.destroy();
+  }catch (exception) {
   }
-]);
+
+  return res.send("");
+
+});
+
 
 router.get("/grades", async (req, res, next) => {
   let grades = await gradeController.getAll();

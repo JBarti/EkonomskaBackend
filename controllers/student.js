@@ -7,9 +7,9 @@ const {
   Folder,
   Question,
   Solution,
-  Notification,
   Outcome,
-  Income
+  Income,
+  Notification
 } = require("./config");
 const logger = require("../logger");
 const { sequelize } = require("./config");
@@ -25,29 +25,27 @@ const Controller = {
     });
   },
 
-  get: (email, password, logingIn = true) => {
-    return new Promise((resolve, reject) => {
-      Student.find({
+  get: (email, password) => {
+      return Student.find({
         attributes: [
           "id",
           "firstName",
           "lastName",
           "email",
-          "notifications",
-          "active",
           "gradeId"
         ],
         include: [
           { model: Outcome },
           { model: Income },
+          { model: Solution },
           {
             model: Grade,
             include: [
-              { model: Notification },
               {
                 model: Folder,
                 include: [{ model: Test, include: [Question] }, { model: File }]
-              }
+              },
+              {model: Notification}
             ]
           }
         ],
@@ -55,22 +53,39 @@ const Controller = {
           email: email,
           password: password
         }
-      })
-        .then(student => {
-          Controller.getSolutions(student.id).then(solutions => {
-            student = student.get({ plain: true });
-            console.log("\n\n");
-            console.log(solutions);
-            console.log("\n\n");
-            student.solutions = solutions;
-            resolve(student);
-          });
-        })
-        .catch(error => {
-          reject("Could not find student");
-        });
     });
   },
+
+  getById: id => {
+    return Student.find({
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "gradeId"
+      ],
+      include: [
+          { model: Outcome },
+          { model: Income },
+          { model: Solution },
+          {
+            model: Grade,
+            include: [
+              {
+                model: Folder,
+                include: [{ model: Test, includel: [Question] }, { model: File }]
+              },
+              {model: Notification}
+            ]
+          }
+        ],
+      where: {
+        id: id
+      }
+    });
+  },
+
   getByIdSecond: id => {
     return Student.find({
       attributes: [
@@ -78,54 +93,12 @@ const Controller = {
         "firstName",
         "lastName",
         "email",
-        "notifications",
-        "active",
         "gradeId"
       ],
       where: { id: id }
     });
   },
-  getById: id => {
-    return new Promise((resolve, reject) => {
-      Student.find({
-        attributes: [
-          "id",
-          "firstName",
-          "lastName",
-          "email",
-          "active",
-          "gradeId",
-          "notifications"
-        ],
-        include: [
-          { model: Outcome },
-          { model: Income },
-          {
-            model: Grade,
-            include: [
-              { model: Notification },
-              {
-                model: Folder,
-                include: [{ model: Test, include: [Question] }, { model: File }]
-              }
-            ]
-          }
-        ],
-        where: {
-          id: id
-        }
-      }).then(student => {
-        Controller.getSolutions(student.id).then(solutions => {
-          student = student.get({ plain: true });
-          console.log("\n\n");
-          console.log(solutions);
-          console.log("\n\n");
-          student.solutions = solutions;
-          resolve(student);
-        });
-      });
-    });
-  },
+
   getSolutions: studentId => {
     return Solution.findAll({ where: { studentId } });
   },
@@ -138,40 +111,6 @@ const Controller = {
   },
   getGradeSolutions: studentIds => {
     return Solution.findAll({ where: { studentId: { [Op.in]: studentIds } } });
-  },
-  addNotification: (id, { from, description, text, important }) => {
-    return Student.update(
-      {
-        notifications: sequelize.fn(
-          "array_append",
-          sequelize.col("notifications"),
-          JSON.stringify({
-            from,
-            description,
-            text,
-            important
-          })
-        )
-      },
-      {
-        where: {
-          id: id
-        }
-      }
-    );
-  },
-  addFinance: (studentId, financeId) => {
-    logger.logError(studentId);
-    return new Promise((resolve, reject) => {
-      Controller.getByIdSecond(studentId)
-        .then(student => {
-          student.addFinance(financeId);
-          resolve("added finance to student");
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
   },
   addIncome: (studentId, incomeId) => {
     logger.logError(studentId);
@@ -201,19 +140,7 @@ const Controller = {
         });
     });
   },
-  makeInactive: (id, email) => {
-    return Student.update(
-      {
-        active: false
-      },
-      {
-        where: {
-          email: email,
-          id: id
-        }
-      }
-    );
-  },
+
   updateCredentials: (id, firstName, lastName, email, password) => {
     return Student.update(
       {
@@ -225,11 +152,13 @@ const Controller = {
       { where: { id: id } }
     );
   },
+
   remove: studentId => {
     return Student.destroy({
       where: { id: studentId }
     });
   },
+
   solveTest: ({ studentId, testId, solution, testPoints, studentsPoints }) => {
     return new Promise((resolve, reject) => {
       Controller.getByIdSecond(studentId)

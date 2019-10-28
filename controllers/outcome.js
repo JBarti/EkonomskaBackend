@@ -21,10 +21,10 @@ const Controller = {
   },
 
   changeAmount: async outcomes => {
-    outcomes.forEach(async outcome => {
+    for (const outcome of outcomes) {
       let { change, id } = outcome;
       await Outcome.update({ change }, { where: { id } });
-    });
+    }
   }
 };
 

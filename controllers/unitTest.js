@@ -1,7 +1,6 @@
 const logger = require("../logger");
 const studentController = require("./student");
 const gradeController = require("./grade");
-const financeController = require("./finance");
 const testController = require("./test");
 const questionController = require("./question");
 const fileController = require("./file");
@@ -16,7 +15,7 @@ module.exports = async () => {
   const testUser = {
     firstName: "test",
     lastName: "test",
-    email: "testtest@gmail.com",
+    email: "testtest",
     password: "test"
   };
 
@@ -24,14 +23,6 @@ module.exports = async () => {
   let student = await studentController.create(testUser);
   logger.logData(student);
 
-  logger.logTest("Test addNotification");
-  let status = await studentController.addNotification(1, {
-    from: "CreatorsOfApp",
-    description: "welcome",
-    text: "welcome to the official app",
-    important: false
-  });
-  logger.logData(`${status} added new notification`);
 
   logger.logTest("Test createRazred");
   grade = await gradeController.create({
@@ -42,6 +33,10 @@ module.exports = async () => {
       plain: true
     })
   );
+
+  logger.logTest("Test add notification");
+  const notification = await notificationController.create({description: "DESCRIPTION", title: "TItle", important: false});
+  await gradeController.addNotification(1, 1);
 
   logger.logTest("Test addUcenikToRazred");
   status = await gradeController.addStudent(1, 1);
@@ -55,25 +50,15 @@ module.exports = async () => {
     })
   );
 
-  logger.logTest("Test inactivate user");
-  status = await studentController.makeInactive(1, "testtest@gmail.com");
-  logger.logMessage(
-    status ? "Successfully inactivated user" : "Failed to inactivate user"
-  );
-
   logger.logTest("Test get student");
   try {
     student = await studentController.get(
-      "testtest@gmail.com",
+      "testtest",
       "test",
-      (logingIn = false)
     );
   } catch (error) {
     logger.logError(error);
   }
-  console.log("\n\n\n");
-
-  console.log(student);
   logger.logData(student);
 
   logger.logTest("Test check user existence");
@@ -81,45 +66,6 @@ module.exports = async () => {
   logger.logMessage(`Email testtest@gmail.com exists: ${status}`);
   status = await studentController.checkExistance("invalidmail@gmail.com");
   logger.logMessage(`Email invalidmail@gmail.com exists: ${status}`);
-
-  logger.logTest("Test create revenue");
-  let revenue = await financeController.create({
-    name: "testRevenue",
-    money: 123,
-    type: "revenue"
-  });
-  logger.logMessage("Created new revenue");
-  logger.logData(
-    revenue.get({
-      plain: true
-    })
-  );
-
-  logger.logTest("Test create expense");
-  let expense = await financeController.create({
-    name: "testExpense",
-    money: 312,
-    type: "expense"
-  });
-  logger.logMessage("Created new expense");
-  logger.logData(
-    expense.get({
-      plain: true
-    })
-  );
-
-  logger.logTest("Test create goal");
-  let goal = await financeController.create({
-    name: "testGoal",
-    money: 312,
-    type: "goal"
-  });
-  logger.logMessage("Created new goal");
-  logger.logData(
-    goal.get({
-      plain: true
-    })
-  );
 
   logger.logTest("Create folder");
   let folder = await folderController.create({
@@ -132,14 +78,6 @@ module.exports = async () => {
     type: "l1"
   });
   logger.logData(folder.get({ plain: true }));
-
-  logger.logTest("Add revenue, expense and goal to user");
-  status = await studentController.addFinance(1, 1);
-  logger.logMessage(status);
-  status = await studentController.addFinance(1, 2);
-  logger.logMessage(status);
-  status = await studentController.addFinance(1, 3);
-  logger.logMessage(status);
 
   logger.logTest("Create test");
   let test = await testController.create({
@@ -231,12 +169,12 @@ module.exports = async () => {
   //   password: "aGrgić"
   // });status
 
-  var proffesor = await proffesorController.create({
-    firstName: "Klaudija",
-    lastName: "Dimić",
-    email: "profDimić",
-    password: "kDimić"
-  });
+  // var proffesor = await proffesorController.create({
+  //   firstName: "Klaudija",
+  //   lastName: "Dimić",
+  //   email: "profDimic",
+  //   password: "kDimić"
+  // });
 
   // var proffesor = await proffesorController.create({
   //   firstName: "Sandra",
@@ -248,7 +186,7 @@ module.exports = async () => {
   var proffesor = await proffesorController.create({
     firstName: "Ante",
     lastName: "Bartulović",
-    email: "profBartulović",
+    email: "profBartulovic",
     password: "prof"
   });
 
@@ -328,42 +266,6 @@ module.exports = async () => {
     description: "Pozdrav od kreatora aplikacije"
   });
   status = await gradeController.addNotification(1, 1);
-
-  // logger.logTest("Create income");
-  // let job = await incomeController.create({
-  //   name: "Moj poslić",
-  //   amount: 2000,
-  //   type: "job",
-  //   year: 2
-  // });
-  // let fee = await incomeController.create({
-  //   name: "Test1",
-  //   amount: 500,
-  //   type: "fee",
-  //   year: 2
-  // });
-  // logger.logData(job.get({ plain: true }));
-  // //await studentController.addIncome(1, job.get({ plain: true }).id);
-  // logger.logData(fee.get({ plain: true }));
-  // //await studentController.addIncome(1, fee.get({ plain: true }).id);
-
-  // logger.logTest("Create outcome");
-  // let hrana = await outcomeController.create({
-  //   type: "Hrana",
-  //   amount: 500,
-  //   change: 0,
-  //   year: 2
-  // });
-  // let kredit = await outcomeController.create({
-  //   type: "Kredit",
-  //   amount: 300,
-  //   year: 2
-  // });
-
-  // // logger.logData(hrana.get({ plain: true }));
-  // // await studentController.addOutcome(1, hrana.get({ plain: true }).id);
-  // // logger.logData(kredit.get({ plain: true }));
-  // // await studentController.addOutcome(1, kredit.get({ plain: true }).id);
 
   logger.logTest("Get grade");
   grade = await gradeController.get(1, [Student, Folder, Notification]);

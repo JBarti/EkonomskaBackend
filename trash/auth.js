@@ -3,9 +3,9 @@ var uuid = require("uuid/v4");
 var LocalStrategy = require("passport-local").Strategy;
 var expressSession = require("express-session");
 var FileStore = require("session-file-store")(expressSession);
-var logger = require("./logger");
-var StudentController = require("./controllers/student");
-var ProffesorController = require("./controllers/proffesor");
+var logger = require("../logger");
+var StudentController = require("../controllers/student");
+var ProffesorController = require("../controllers/proffesor");
 
 createAuthPoint = (userType, UserController) => {
   passport.use(

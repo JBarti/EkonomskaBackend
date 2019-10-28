@@ -13,8 +13,5 @@ module.exports = (sequelize, types) => {
     description: {
       type: types.STRING
     },
-    important: {
-      type: types.BOOLEAN
-    }
   });
 };

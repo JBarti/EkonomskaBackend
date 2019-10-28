@@ -26,11 +26,7 @@ const Controller = {
   },
 
   get: (email, password) => {
-    console.log(
-      `Test get: \nentered email: ${email} \nentered password: ${password}`
-    );
-    return new Promise((res, rej) => {
-      Proffesor.find({
+      return Proffesor.find({
         attributes: ["id", "firstName", "lastName", "email", "notifications"],
         include: [
           {
@@ -39,9 +35,9 @@ const Controller = {
               {
                 model: Student,
                 include: [
-                  { model: Solution },
-                  { model: Income },
-                  { model: Outcome }
+                  Solution,
+                  Income,
+                  Outcome,
                 ]
               },
               { model: Notification },
@@ -56,27 +52,8 @@ const Controller = {
           email: email,
           password: password
         }
-      }).then(async data => {
-        try {
-          var proffesor = data.get({ plain: true });
-        } catch (err) {
-          res(undefined);
-        }
-        for (let grade in proffesor.grades) {
-          console.log("GREJD");
-          for (let student in grade.students) {
-            console.log(student.id);
-            student.solutions = await StudentController.getSolutions(
-              student.id
-            );
-            logger.logData(student.solutions);
-          }
-        }
-        logger.logData(data);
-        res(data);
-      });
-    });
-  },
+      })
+    },
 
   getById: proffesorId => {
     return new Promise((res, rej) => {
@@ -88,7 +65,11 @@ const Controller = {
             include: [
               {
                 model: Student,
-                include: [Outcome, Income]
+                include: [
+                  Solution,
+                  Income,
+                  Outcome,
+                ]
               },
               { model: Notification },
               {

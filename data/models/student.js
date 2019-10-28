@@ -23,13 +23,5 @@ module.exports = (sequelize, types) => {
             type: types.STRING,
             allowNull: false,
         },
-        active: {
-            type: types.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        notifications: {
-            type: types.ARRAY(types.JSON),
-        }
     })
-}
+};

@@ -11,6 +11,7 @@ try {
     }
   });
 } catch (error) {
+  console.log("OVOOOO SE DESILOOOOO");
   sequelize = new Sequelize("ekonomska", "postgres", "admin", {
     dialect: "postgres",
     host: "0.0.0.0",
@@ -19,7 +20,6 @@ try {
 }
 const Student = require("../data/models/student")(sequelize, Sequelize);
 const Grade = require("../data/models/grade")(sequelize, Sequelize);
-const Finance = require("../data/models/finance")(sequelize, Sequelize);
 const Test = require("../data/models/test")(sequelize, Sequelize);
 const Question = require("../data/models/question")(sequelize, Sequelize);
 const File = require("../data/models/file")(sequelize, Sequelize);
@@ -37,14 +37,8 @@ setup = () => {
   Grade.hasMany(Student);
   Student.belongsTo(Grade);
 
+  Solution.belongsTo(Student);
   Student.hasMany(Solution);
-
-  Student.belongsToMany(Finance, {
-    through: "StudentFinance"
-  });
-  Finance.belongsToMany(Student, {
-    through: "StudentFinance"
-  });
 
   Folder.hasMany(File);
   Folder.hasMany(Test);
@@ -52,19 +46,15 @@ setup = () => {
   Grade.hasMany(Folder);
   Grade.hasMany(Notification);
 
-  Test.belongsToMany(Question, {
-    through: "TestQuestion"
-  });
-
-  Question.belongsToMany(Test, {
-    through: "TestQuestion"
-  });
+  Test.hasMany(Question);
+  Question.belongsTo(Test);
 
   Student.hasMany(Solution);
   Student.hasMany(Income);
   Student.hasMany(Outcome);
 
   Proffesor.hasMany(Grade);
+  Grade.belongsTo(Proffesor);
 
   return sequelize.sync({
     force: true
@@ -72,13 +62,12 @@ setup = () => {
 };
 
 module.exports = {
+  sequelize,
   Student,
   Grade,
-  Finance,
   Test,
   File,
   Question,
-  sequelize,
   Solution,
   Proffesor,
   Folder,

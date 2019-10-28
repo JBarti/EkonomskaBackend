@@ -1,11 +1,10 @@
 const { Notification } = require("./config");
 
 const Controller = {
-  create: ({ title, description, important = false }) => {
+  create: ({ title, description }) => {
     return Notification.create({
       title,
       description,
-      important
     });
   },
   removeNotification: notificationId => {

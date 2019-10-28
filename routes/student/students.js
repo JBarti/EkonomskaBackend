@@ -5,7 +5,7 @@ const TestController = require("../../controllers/test");
 const GradeController = require("../../controllers/grade");
 const outcomeController = require("../../controllers/outcome");
 const incomeController = require("../../controllers/income");
-const { passport, session } = require("../../auth");
+const financialHelper = require("./financialPickerHelper.js");
 
 const router = express.Router();
 
@@ -14,21 +14,14 @@ router.get("/test", function(req, res, next) {
 });
 
 router.get("/", async (req, res, next) => {
-  const user = JSON.parse(req.user);
-  if (user.type !== "student") {
-    return res.status(403).send("User not logged in");
+  const { userId } = req.session;
+  console.log("TEST TEST", userId);
+  if (userId) {
+    const student = await StudentController.getById(userId);
+    if(student) return res.send({user: student.get({plain: true}), type: "STUDENT"});
   }
-  logger.logMessage("Retrieved user data");
-  logger.logData(user);
-  if (user) {
-    try {
-      let newUser = await StudentController.getById(user.id);
-      return res.send(newUser);
-    } catch (error) {
-      return res.status(403).send("User not logged in");
-    }
-  }
-  return res.status(403).send("User not logged in");
+
+  return res.status(403).send();
 });
 
 router.get("/logout", (req, res, next) => {
@@ -105,14 +98,15 @@ router.post("/register", async (req, res, next) => {
 });
 
 router.use((req, res, next) => {
-  user = JSON.parse(req.user);
-  return user.type === "student"
+  const userId = req.session.userId;
+  const userType = req.session.userType;
+  return userId && userType === "student"
     ? next()
     : res.status(401).send("Unauthorized access");
 });
 
 router.get("/get", (req, res, next) => {
-  return res.send(JSON.parse(req.user));
+  const { userId, userType } = req.session;
 });
 
 router.post("/test/solve", async (req, res, next) => {
@@ -143,12 +137,15 @@ router.post("/test/solve", async (req, res, next) => {
 
 router.post("/year/1", async (req, res, next) => {
   logger.logMessage("Setting up year 1");
-  let { jobPayment, jobCredit, jobName, studentId } = req.body;
+
+  const { variant, studentId } = req.body;
+  let { jobPayment, jobCredit, jobName, duration } = financialHelper.firstChoice(variant);
+
 
   logger.logTest("Create income");
   let job = await incomeController.create({
     name: jobName,
-    amount: jobPayment - 5000,
+    amount: jobPayment,
     type: "fee",
     year: 1
   });
@@ -159,7 +156,7 @@ router.post("/year/1", async (req, res, next) => {
     type: "Kredit",
     amount: jobCredit,
     year: 1,
-    duration: 4
+    duration: 5
   });
 
   logger.logData(kredit.get({ plain: true }));
@@ -169,10 +166,13 @@ router.post("/year/1", async (req, res, next) => {
 
 router.post("/year/2", async (req, res, next) => {
   logger.logMessage("Setting up year 2");
-  let { studentId, outcome, duration } = req.body;
+  let { studentId, variant } = req.body;
 
-  avarageOutcome = outcome;
-  realOutcome = Math.round(outcome - outcome * Math.random() * 0.03);
+  let { outcome, duration } = financialHelper.unexpectedOutcome(variant);
+
+  let avarageOutcome = outcome;
+  let realOutcome = Math.round(outcome - outcome * Math.random() * 0.03); // Randomize outcome for 3%
+
 
   let kredit = await outcomeController.create({
     type: "Neočekivano",
@@ -188,10 +188,8 @@ router.post("/year/2", async (req, res, next) => {
 
 router.post("/year/3", async (req, res, next) => {
   logger.logMessage("Setting up year 3");
-  let { studentId, totalSavings, interestRate } = req.body;
-
-  console.log(totalSavings);
-  console.log(interestRate);
+  let { studentId, totalSavings, variant } = req.body;
+  let interestRate = financialHelper(variant);
 
   if (totalSavings <= 0) {
     let saving = await incomeController.create({
