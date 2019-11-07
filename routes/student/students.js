@@ -189,7 +189,8 @@ router.post("/year/2", async (req, res, next) => {
 router.post("/year/3", async (req, res, next) => {
   logger.logMessage("Setting up year 3");
   let { studentId, totalSavings, variant } = req.body;
-  let interestRate = financialHelper(variant);
+  let interestRate = financialHelper.investment(variant);
+
 
   if (totalSavings <= 0) {
     let saving = await incomeController.create({

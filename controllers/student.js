@@ -74,7 +74,7 @@ const Controller = {
             include: [
               {
                 model: Folder,
-                include: [{ model: Test, includel: [Question] }, { model: File }]
+                include: [{ model: Test, include: [Question] }, { model: File }]
               },
               {model: Notification}
             ]
